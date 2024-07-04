@@ -1,7 +1,9 @@
 package com.example.userservice.controllers;
 
+import com.example.userservice.dtos.LoginDto;
 import com.example.userservice.dtos.SignupDto;
 import com.example.userservice.dtos.SignupResponseDto;
+import com.example.userservice.models.Token;
 import com.example.userservice.models.User;
 import com.example.userservice.services.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,11 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @PostMapping("/login")
+    public Token login(@RequestBody LoginDto loginDto) {
+        return userService.login(loginDto.getEmail(), loginDto.getPassword());
     }
 
     @PostMapping("/signup")
