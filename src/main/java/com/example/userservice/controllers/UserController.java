@@ -1,11 +1,13 @@
 package com.example.userservice.controllers;
 
 import com.example.userservice.dtos.LoginDto;
+import com.example.userservice.dtos.LogoutDto;
 import com.example.userservice.dtos.SignupDto;
 import com.example.userservice.dtos.SignupResponseDto;
 import com.example.userservice.models.Token;
 import com.example.userservice.models.User;
 import com.example.userservice.services.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +22,12 @@ public class UserController {
     @PostMapping("/login")
     public Token login(@RequestBody LoginDto loginDto) {
         return userService.login(loginDto.getEmail(), loginDto.getPassword());
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody LogoutDto logoutDto) {
+        userService.logout(logoutDto.getToken());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/signup")

@@ -52,6 +52,18 @@ public class UserService {
         return null;
     }
 
+    public void logout(String token) {
+        Optional<Token> optionalToken = tokenRepo.findByValueAndDeletedEquals(token, false);
+        if (optionalToken.isEmpty()) {
+            //TODO: throw exception
+
+        }
+        Token toDelete = optionalToken.get();
+        toDelete.setDeleted(true);
+        tokenRepo.save(toDelete);
+
+    }
+
 
     public User signup(String name, String email, String password) {
         // TODO: Validation
