@@ -7,12 +7,4 @@ import lombok.Setter;
 @Setter
 public class LogoutDto {
     private String token;
-
-    @Setter
-    @Getter
-    public static class SignUpResponseDto {
-        private String name;
-        private String email;
-        private boolean isEmailVerified;
-    }
 }
