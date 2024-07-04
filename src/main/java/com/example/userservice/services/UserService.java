@@ -76,4 +76,20 @@ public class UserService {
         User saveduser = userRepo.save(u);
         return saveduser;
     }
+
+    public User validateToken(String token) {
+        Optional<Token> token1 = tokenRepo.findByValueAndDeletedEquals(token, false);
+        //Optional<Token> token1 = tokenRepository.findByValueAndDeletedEqualsAndExipryAtGreaterThan(token, false);
+
+        if (token1.isEmpty()) {
+            return null;
+        }
+
+        Token t = token1.get();
+        if (t.getExpiryAt().before(new Date())) {
+            return null;
+        }
+
+        return t.getUser();
+    }
 }

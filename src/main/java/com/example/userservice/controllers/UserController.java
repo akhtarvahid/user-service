@@ -7,6 +7,7 @@ import com.example.userservice.dtos.SignupResponseDto;
 import com.example.userservice.models.Token;
 import com.example.userservice.models.User;
 import com.example.userservice.services.UserService;
+import lombok.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,5 +47,9 @@ public class UserController {
         dto.setEmailVerified(user.isEmailVerified());
 
         return dto;
+    }
+    @PostMapping("/validate/{token}")
+    public User validateToken(@PathVariable("token") @NonNull String token) {
+        return userService.validateToken(token);
     }
 }
