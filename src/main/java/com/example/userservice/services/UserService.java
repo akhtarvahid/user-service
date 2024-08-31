@@ -74,6 +74,8 @@ public class UserService {
         u.setHashedPassword(bCryptPasswordEncoder.encode(password));
 
         User saveduser = userRepo.save(u);
+
+        System.out.println("signup called" + saveduser);
         return saveduser;
     }
 
