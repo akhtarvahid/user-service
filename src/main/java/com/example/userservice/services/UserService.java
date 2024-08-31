@@ -30,13 +30,11 @@ public class UserService {
     public User signUp(String email,
                        String name,
                        String password) {
-        System.out.println("1.Service getting called");
         User user = new User();
         user.setEmail(email);
         user.setName(name);
         user.setHashedPassword(bCryptPasswordEncoder.encode(password));
         user.setEmailVerified(true);
-        System.out.println("2.Service getting called" + user);
         //save the user object to the DB.
         return userRepository.save(user);
     }
@@ -51,15 +49,13 @@ public class UserService {
         User user = optionalUser.get();
 
         if (!bCryptPasswordEncoder.matches(password, user.getHashedPassword())) {
-            //Throw some exception.
-            return null;
+            throw new UserNotFoundException("User password " + password + " doesn't match");
         }
 
         //Login successful, generate a Token.
         Token token = generateToken(user);
-        Token savedToken = tokenRepository.save(token);
 
-        return savedToken;
+        return tokenRepository.save(token);
     }
 
     private Token generateToken(User user) {
@@ -77,12 +73,14 @@ public class UserService {
     }
 
     public void logout(String tokenValue) {
-        Optional<Token> optionalToken = tokenRepository.findByValueAndDeleted(tokenValue, false);
+
+        Optional<Token> optionalToken = tokenRepository.findByValueAndDeletedEquals(tokenValue, false);
 
         if (optionalToken.isEmpty()) {
             //Throw new Exception
             return;
         }
+
 
         Token token = optionalToken.get();
         token.setDeleted(true);
@@ -92,11 +90,8 @@ public class UserService {
     public User validateToken(String token) {
         Optional<Token> optionalToken = tokenRepository.findByValueAndDeletedAndExpiryAtGreaterThan(token, false, new Date());
 
-        if (optionalToken.isEmpty()) {
-            //Throw new Exception
-            return null;
-        }
+        //Throw new Exception
+        return optionalToken.map(Token::getUser).orElse(null);
 
-        return optionalToken.get().getUser();
     }
 }

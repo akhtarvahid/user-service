@@ -19,4 +19,5 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     select * from tokens where value = tokenValue and deleted = false and expiry_date > time.
      */
     Optional<Token> findByValueAndDeletedAndExpiryAtGreaterThan(String tokenValue, boolean deleted, Date currentTime);
+    Optional<Token> findByValueAndDeletedEquals(String tokenValue, boolean isDeleted);
 }
