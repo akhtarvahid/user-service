@@ -15,9 +15,9 @@ import java.util.Date;
 import java.util.Optional;
 @Service
 public class UserService {
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private UserRepository userRepository;
-    private TokenRepository tokenRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
 
     UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
                 UserRepository userRepository,
