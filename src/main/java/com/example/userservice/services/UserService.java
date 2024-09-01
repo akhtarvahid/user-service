@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
+
 @Service
 public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -72,13 +73,13 @@ public class UserService {
         return token;
     }
 
+    // If token is active, make deleted:false which means user logged out
     public void logout(String tokenValue) {
 
-        Optional<Token> optionalToken = tokenRepository.findByValueAndDeletedEquals(tokenValue, false);
+        Optional<Token> optionalToken = tokenRepository.findByValueAndDeleted(tokenValue, false);
 
         if (optionalToken.isEmpty()) {
-            //Throw new Exception
-            return;
+            throw new UserNotFoundException("Token is not provided!");
         }
 
 
@@ -87,6 +88,7 @@ public class UserService {
         tokenRepository.save(token);
     }
 
+    // If token is active returns users details else 200
     public User validateToken(String token) {
         Optional<Token> optionalToken = tokenRepository.findByValueAndDeletedAndExpiryAtGreaterThan(token, false, new Date());
 
