@@ -3,53 +3,59 @@ package com.example.userservice.controllers;
 import com.example.userservice.dtos.LoginDto;
 import com.example.userservice.dtos.LogoutDto;
 import com.example.userservice.dtos.SignupDto;
-import com.example.userservice.dtos.SignupResponseDto;
+import com.example.userservice.dtos.UserDto;
 import com.example.userservice.models.Token;
 import com.example.userservice.models.User;
 import com.example.userservice.services.UserService;
-import lombok.NonNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
-    public UserController(UserService userService) {
+    UserController(UserService userService) {
         this.userService = userService;
     }
 
+    @PostMapping("/signup")
+    public UserDto signUp(@RequestBody SignupDto requestDto) {
+        User user = userService.signUp(
+                requestDto.getEmail(),
+                requestDto.getName(),
+                requestDto.getPassword()
+        );
+
+        System.out.println("Controller getting called" + user);
+        return UserDto.from(user);
+    }
+
     @PostMapping("/login")
-    public Token login(@RequestBody LoginDto loginDto) {
-        return userService.login(loginDto.getEmail(), loginDto.getPassword());
+    public Token login(@RequestBody LoginDto requestDto) {
+
+        return userService.login(
+                requestDto.getEmail(),
+                requestDto.getPassword()
+        );
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody LogoutDto logoutDto) {
-        userService.logout(logoutDto.getToken());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> logout(@RequestBody LogoutDto requestDto) {
+        userService.logout(requestDto.getToken());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/signup")
-    public SignupResponseDto signup(@RequestBody SignupDto signupDto) {
-        return toSignUpResponseDto(userService.signup(signupDto.getName(), signupDto.getEmail(), signupDto.getPassword()));
+    @GetMapping("/validate/{token}")
+    public UserDto validateToken(@PathVariable String token) {
+        User user = userService.validateToken(token);
+
+        return UserDto.from(user);
     }
 
-    public SignupResponseDto toSignUpResponseDto(User user) {
-        if (user == null) {
-            return null; // Or throw an exception, based on your error handling policy
-        }
-
-        SignupResponseDto dto = new SignupResponseDto();
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setEmailVerified(user.isEmailVerified());
-
-        return dto;
-    }
-    @PostMapping("/validate/{token}")
-    public User validateToken(@PathVariable("token") @NonNull String token) {
-        return userService.validateToken(token);
+    @GetMapping("/users/{id}")
+    public UserDto getUserById(@PathVariable Long id) {
+        return null;
     }
 }

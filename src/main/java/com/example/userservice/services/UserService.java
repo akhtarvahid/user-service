@@ -1,9 +1,10 @@
 package com.example.userservice.services;
 
+import com.example.userservice.exceptions.UserNotFoundException;
 import com.example.userservice.models.Token;
 import com.example.userservice.models.User;
-import com.example.userservice.repositories.TokenRepo;
-import com.example.userservice.repositories.UserRepo;
+import com.example.userservice.repositories.TokenRepository;
+import com.example.userservice.repositories.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,83 +16,84 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    private UserRepo userRepo;
-    private TokenRepo tokenRepo;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
 
-    public UserService(
-            UserRepo userRepo,
-            TokenRepo tokenRepo,
-            BCryptPasswordEncoder bCryptPasswordEncoder
-    ) {
-        this.userRepo = userRepo;
-        this.tokenRepo = tokenRepo;
+    UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
+                UserRepository userRepository,
+                TokenRepository tokenRepository) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
+    }
+
+    public User signUp(String email,
+                       String name,
+                       String password) {
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        user.setHashedPassword(bCryptPasswordEncoder.encode(password));
+        user.setEmailVerified(true);
+        //save the user object to the DB.
+        return userRepository.save(user);
     }
 
     public Token login(String email, String password) {
-        Optional<User> userOptional = userRepo.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            //TODO: Throw exception
-            return null;
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User with email " + email + " doesn't exist");
         }
 
-        User user = userOptional.get();
-        if (bCryptPasswordEncoder.matches(password, user.getHashedPassword())) {
-            Token token = new Token();
-            token.setUser(user);
-            token.setValue(RandomStringUtils.randomAlphabetic(128));
-            LocalDate today = LocalDate.now();
-            LocalDate onedayLater = today.plusDays(1);
-            Date expiryAt = Date.from(onedayLater.atStartOfDay(ZoneId.systemDefault()).toInstant());
-            token.setExpiryAt(expiryAt);
-            return tokenRepo.save(token);
+        User user = optionalUser.get();
+
+        if (!bCryptPasswordEncoder.matches(password, user.getHashedPassword())) {
+            throw new UserNotFoundException("User password " + password + " doesn't match");
         }
 
+        //Login successful, generate a Token.
+        Token token = generateToken(user);
 
-        return null;
+        return tokenRepository.save(token);
     }
 
-    public void logout(String token) {
-        Optional<Token> optionalToken = tokenRepo.findByValueAndDeletedEquals(token, false);
+    private Token generateToken(User user) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate thirtyDaysLater = currentDate.plusDays(30);
+
+        Date expiryDate = Date.from(thirtyDaysLater.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        Token token = new Token();
+        token.setExpiryAt(expiryDate);
+        //128 character alphanumeric string.
+        token.setValue(RandomStringUtils.randomAlphanumeric(128));
+        token.setUser(user);
+        return token;
+    }
+
+    // If token is active, make deleted:false which means user logged out
+    public void logout(String tokenValue) {
+
+        Optional<Token> optionalToken = tokenRepository.findByValueAndDeleted(tokenValue, false);
+
         if (optionalToken.isEmpty()) {
-            //TODO: throw exception
-
+            throw new UserNotFoundException("Token is not provided!");
         }
-        Token toDelete = optionalToken.get();
-        toDelete.setDeleted(true);
-        tokenRepo.save(toDelete);
 
+
+        Token token = optionalToken.get();
+        token.setDeleted(true);
+        tokenRepository.save(token);
     }
 
-
-    public User signup(String name, String email, String password) {
-        // TODO: Validation
-
-        User u = new User();
-        u.setEmail(email);
-        u.setName(name);
-        u.setHashedPassword(bCryptPasswordEncoder.encode(password));
-
-        User saveduser = userRepo.save(u);
-
-        System.out.println("signup called" + saveduser);
-        return saveduser;
-    }
-
+    // If token is active returns users details else 200
     public User validateToken(String token) {
-        Optional<Token> token1 = tokenRepo.findByValueAndDeletedEquals(token, false);
-        //Optional<Token> token1 = tokenRepository.findByValueAndDeletedEqualsAndExipryAtGreaterThan(token, false);
+        Optional<Token> optionalToken = tokenRepository.findByValueAndDeletedAndExpiryAtGreaterThan(token, false, new Date());
 
-        if (token1.isEmpty()) {
-            return null;
-        }
+        //Throw new Exception
+        return optionalToken.map(Token::getUser).orElse(null);
 
-        Token t = token1.get();
-        if (t.getExpiryAt().before(new Date())) {
-            return null;
-        }
-
-        return t.getUser();
     }
 }
