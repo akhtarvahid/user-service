@@ -1,5 +1,4 @@
 package com.example.userservice;
-
 import com.example.userservice.security.repositories.JpaRegisteredClientRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +12,18 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import java.util.UUID;
 
 @SpringBootTest
-class UserserviceApplicationTests {
+class UserServiceEveBatchApplicationTests {
 	@Autowired
 	private JpaRegisteredClientRepository jpaRegisteredClientRepository;
+
 	@Test
 	void contextLoads() {
 	}
 
-//	    @Test
+//    @Test
 //    public void addSampleRegisteredClient() {
 //        RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
-//                .clientId("oidc-client") // scaler
+//                .clientId("oidc-client") // myntra, amazon, etc
 //                .clientSecret("$2a$12$G2ZP0f0AZdWxCHPVp8Y75ueMJVtjreFE/9uSqBDxqs9QoC9/cLndu")
 //                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 //                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
@@ -38,5 +38,4 @@ class UserserviceApplicationTests {
 //
 //        jpaRegisteredClientRepository.save(oidcClient);
 //    }
-
 }
