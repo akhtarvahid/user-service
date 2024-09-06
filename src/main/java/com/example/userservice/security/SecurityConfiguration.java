@@ -88,21 +88,21 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.builder()
-                .username("user")
-                .password("$2a$12$BnfzwkC6F87/wpGBCCv5h.CwXYDP9sXPKDRLh9BGCSmLQKFfIlxou")
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(userDetails);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        UserDetails userDetails = User.builder()
+//                .username("user")
+//                .password("$2a$12$BnfzwkC6F87/wpGBCCv5h.CwXYDP9sXPKDRLh9BGCSmLQKFfIlxou")
+//                .roles("USER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(userDetails);
+//    }
 
 //    @Bean
 //    public RegisteredClientRepository registeredClientRepository() {
 //        RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
-//                .clientId("oidc-client") // scaler
+//                .clientId("oidc-client") // any client such as amazon, myntra etc.
 //                .clientSecret("$2a$12$G2ZP0f0AZdWxCHPVp8Y75ueMJVtjreFE/9uSqBDxqs9QoC9/cLndu")
 //                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 //                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)

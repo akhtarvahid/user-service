@@ -16,9 +16,9 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private UserRepository userRepository;
+    private TokenRepository tokenRepository;
 
     UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
                 UserRepository userRepository,

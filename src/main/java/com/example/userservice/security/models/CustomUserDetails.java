@@ -5,7 +5,6 @@ import com.example.userservice.models.Role;
 import com.example.userservice.models.User;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +29,7 @@ public class CustomUserDetails implements UserDetails {
     private List<CustomGrantedAuthority> authorities;
     private Long userId;
 
+    // Default constructor will be used by the jackson library
     public CustomUserDetails() {
 
     }
@@ -86,7 +86,5 @@ public class CustomUserDetails implements UserDetails {
         return enabled;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
+    public Long getUserId() {return userId;}
 }
