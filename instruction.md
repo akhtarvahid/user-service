@@ -7,6 +7,7 @@ Docker command to start postgres
 
 
 
-ADD users to the table
+ADD users to the table by commenting everything in SecurityConfiguration then signup from postman
 ADD roles to the table
 ADD(Map) role, user table id's in users_role
+Run addSampleRegisteredClient testcase to add client
