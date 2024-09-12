@@ -1,5 +1,7 @@
 .DS_Store
 /target
+.idea
+.idea/
 .metadata
 bin/
 tmp/

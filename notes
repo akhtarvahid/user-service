@@ -1,4 +1,7 @@
-RDS
+Follow the steps to deploy user-service api and postgres on AWS
+- RDS
+- Elastic beanstalk
+
 
 Go to RDS
 1. click on create database
