@@ -1,0 +1,75 @@
+Follow the steps to deploy user-service api and postgres on AWS
+- RDS
+- Elastic beanstalk
+
+
+Go to RDS
+1. click on create database
+2. Select PostgresSQL
+3. Enable -> Show versions that support the Multi-AZ DB cluster
+4. Select Templates -> Free tier
+5. Enter DB instance identifier name -> <product-service>
+6. Enter Master username -> <postgres>
+7. Enter Master password -> <postgres>
+8. Enable Public access -> Yes
+9. Keep Existing VPC security groups -> default
+10. Enter port number in Additional configuration section
+11. Uncheck Turn on Performance Insights
+12. Enter database name inside Additional configuration
+13. Uncheck Enable automated backups
+14. Uncheck Enable encryption
+15. Uncheck Enable auto minor version upgrade
+16. Click on create database button
+17. Don't forget to add port number in security rules
+
+
+
+How to create amazon elastic beanstalk
+1. Click on create application
+2. Keep web server environment
+3. Enter application name
+4. Enter environment name or leave as default
+5. Enter domain(ex-products-service)
+6. Select platform as java
+7. Select platform branch(supported version of java(ex- 17)) -> check in pom.xml
+8. Keep Platform version leave as recommended
+9. Check upload code and enter version label(ex-> products-service-v1.0)
+10. Select local file and upload jar file of built(maven->ProductService->Lifecycle->double click on package to build latest jar) springboot app
+11. Select Presets as custom configuration
+12. Click NEXT
+13. Select Existing service role(ex-productServiceEbsRole) if you have created otherwise create role(https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/roles)
+14. Select EC2 key pair which gets create while EC2 instance creation.
+15. Select EC2 instance profile(ex-productServiceEbsRole)
+16. Click NEXT
+17. Select Virtual Private Cloud (VPC)
+18. Check Public IP address as activated
+19. Check all Instance subnets
+20. Check all Choose database subnets
+21. Click NEXT
+22. Select EC2 security groups -> default
+23. Select Load balanced as Environment type and keep min 1 and max 2(for high loads)
+24. Keep Instance types-> t3.micro only
+25. Select Metric -> CPUUtilization
+26. Select Unit -> Percentage
+27. Enter Upper threshold->80(percentage) and Lower threshold-> 20(percentage)
+28. Check the row in Processes to edit and enter springboot app port number(ex-8080)
+29. Click on NEXT
+30. Select Health reporting -> Basic
+31. Uncheck Managed updates
+32. Select Deployment policy-> rolling
+33. Check Fixed and enter Deployment batch size->1   (deployment should happen at one server at a time)
+34. Enter all the environment properties(ex-USER_SERVICE_DB_PASSWORD, USER_SERVICE_DB_URL, USER_SERVICE_DB_USERNAME)
+35. Click on submit
+
+
+
+How to create Role -https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/roles
+
+1. Click on create role
+2. Keep Trusted entity type as AWS service
+3. Select EC2
+4. Click on NEXT
+5. Search and select AWSElasticBeanstalkMulticontainerDocker, AWSElasticBeanstalkWebTier, AWSElasticBeanstalkWorkerTier.
+6. Click NEXT
+7. Enter Role name(ex-productServiceEbsRole)
+8. Click on CREATE ROLE button

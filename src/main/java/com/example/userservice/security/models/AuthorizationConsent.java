@@ -1,6 +1,5 @@
 package com.example.userservice.security.models;
 
-
 import java.io.Serializable;
 import java.util.Objects;
 
