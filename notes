@@ -25,6 +25,10 @@ Go to RDS
 
 
 How to create amazon elastic beanstalk
+NOTE: Once you have created elastic beanstalk, you can't update VPC
+    : Make sure you create VPC first otherwise you can't update once elastic beanstalk created
+
+
 1. Click on create application
 2. Keep web server environment
 3. Enter application name
@@ -60,6 +64,7 @@ How to create amazon elastic beanstalk
 33. Check Fixed and enter Deployment batch size->1   (deployment should happen at one server at a time)
 34. Enter all the environment properties(ex-USER_SERVICE_DB_PASSWORD, USER_SERVICE_DB_URL, USER_SERVICE_DB_USERNAME)
 35. Click on submit
+
 
 
 
