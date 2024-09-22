@@ -7,9 +7,12 @@ import com.example.userservice.dtos.UserDto;
 import com.example.userservice.models.Token;
 import com.example.userservice.models.User;
 import com.example.userservice.services.UserService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -58,5 +61,12 @@ public class UserController {
     public UserDto getUserById(@PathVariable Long id) {
         System.out.println("Received request for user with id: " + id);
         return null;
+    }
+
+    @GetMapping("/all")
+    public List<User> getSingleUserById() {
+        List<User> users = userService.getAllUsers();
+
+        return ResponseEntity.ok(users).getBody();
     }
 }

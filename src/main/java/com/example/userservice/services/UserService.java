@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -95,5 +96,8 @@ public class UserService {
         //Throw new Exception
         return optionalToken.map(Token::getUser).orElse(null);
 
+    }
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }
