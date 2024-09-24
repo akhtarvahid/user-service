@@ -1,11 +1,15 @@
 package com.example.userservice.services;
 
+import com.example.userservice.dtos.SendEmailMessageDto;
 import com.example.userservice.exceptions.UserNotFoundException;
 import com.example.userservice.models.Token;
 import com.example.userservice.models.User;
 import com.example.userservice.repositories.TokenRepository;
 import com.example.userservice.repositories.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +24,19 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private ObjectMapper objectMapper;
 
     UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
                 UserRepository userRepository,
-                TokenRepository tokenRepository) {
+                TokenRepository tokenRepository,
+                KafkaTemplate<String, String> kafkaTemplate,
+                ObjectMapper objectMapper) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
+        this.kafkaTemplate = kafkaTemplate;
+        this.objectMapper = objectMapper;
     }
 
     public User signUp(String email,
@@ -38,7 +48,27 @@ public class UserService {
         user.setHashedPassword(bCryptPasswordEncoder.encode(password));
         user.setEmailVerified(true);
         //save the user object to the DB.
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        SendEmailMessageDto emailMessageDto = new SendEmailMessageDto();
+        emailMessageDto.setTo(savedUser.getEmail());
+        emailMessageDto.setFrom("akhtarvahid543@gmail.com");
+        emailMessageDto.setSubject("Welcome to the akhtarvahid platform - we're thrilled to have you on board!");
+        emailMessageDto.setBody("You’ve successfully joined our community, and we’re excited for you to start exploring all the features we have to offer. Whether you’re here to [mention the core value or feature of your product/service], we’re here to support you every step of the way");
+
+
+        try {
+            kafkaTemplate.send(
+                    "sendEmail",
+                    objectMapper.writeValueAsString(emailMessageDto)
+            );
+        } catch (JsonProcessingException e) {
+            System.out.println("Encountered error::" +e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+
+        return savedUser;
     }
 
     public Token login(String email, String password) {

@@ -31,7 +31,7 @@ public class UserController {
                 requestDto.getPassword()
         );
 
-        System.out.println("Controller getting called" + user);
+        System.out.println("Successfully signed up user: " + user);
         return UserDto.from(user);
     }
 
