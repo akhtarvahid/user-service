@@ -35,3 +35,6 @@ Run `addSampleRegisteredClient` testcase to add client
 ```bash
 git rm -r --cached .idea
 ```
+
+#### Health check of service
+http://localhost:8081/actuator/health
